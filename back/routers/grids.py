@@ -1,7 +1,7 @@
 from typing import List, Union
 from fastapi import APIRouter, status, HTTPException, Depends
 from database import get_session, select, Session
-from database.models import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations
+from database.models import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates, States
 
 
 router = APIRouter(
@@ -59,3 +59,17 @@ async def remove_grid(grid_id: int):
 		session.delete(grid)
 		session.commit()
 		return
+
+
+@router.get("/state/{grid_id}", response_model=GridReadWithStates)
+async def get_grid_states(grid_id: int, user:Union[str, None] = None, session: Session = Depends(get_session)):
+	print(user, grid_id)
+	grid = session.get(Grids, grid_id)
+	if (not grid):
+		raise HTTPException(status_code=404, detail="Grid not found")
+	statement = select(States).where(States.entity_type == "grid",
+									States.entity_id == grid_id)
+	if (user is not None):
+		statement = statement.where(States.user == user)
+	states = session.exec(statement)
+	return { "grid": grid, "states": states.all() }

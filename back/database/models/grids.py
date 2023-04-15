@@ -1,5 +1,7 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
+from pydantic import BaseModel
+from .state import StateRead, StateUpdate
 
 
 class GridBase(SQLModel):
@@ -27,3 +29,8 @@ class GridUpdate(SQLModel):
 class GridReadWithRelations(GridRead):
 	cells: List["CellRead"] = []
 	zones: List["ZoneReadWithCells"] = []
+
+
+class GridReadWithStates(BaseModel):
+	grid: GridRead
+	states: List[StateRead]

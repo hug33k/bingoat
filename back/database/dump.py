@@ -1,5 +1,5 @@
 from sqlmodel import Session
-from .models import Grids, Cells, Zones, CellsZonesLink
+from .models import Grids, Cells, Zones, CellsZonesLink, States
 
 
 def inject_grids(session):
@@ -35,10 +35,21 @@ def inject_zones(session, grids, cells):
     return zones
 
 
+def inject_states(session):
+    states = [
+        States(user="test", status=False, marker="", entity_type="grid", entity_id=1),
+        States(user="test", status=True, marker="blblbl", entity_type="cell", entity_id=1)
+    ]
+    for state in states:
+        session.add(state)
+    session.commit()
+    return states
+
 
 def inject(engine):
     with Session(engine) as session:
         grids = inject_grids(session)
         cells = inject_cells(session, grids)
         zones = inject_zones(session, grids, cells)
+        states = inject_states(session)
         session.close()

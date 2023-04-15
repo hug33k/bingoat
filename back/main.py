@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import grids, cells, zones, misc
+from routers import grids, cells, zones, states, misc
+from websocket import router as websocket
 
 
 app = FastAPI()
 
-#from database import db
-#db.init_db()
+# from database import db
+# db.init_db()
 
 app.add_middleware(
 	CORSMiddleware,
@@ -18,4 +19,6 @@ app.add_middleware(
 app.include_router(grids.router)
 app.include_router(cells.router)
 app.include_router(zones.router)
+app.include_router(states.router)
+app.include_router(websocket.router)
 app.include_router(misc.router)

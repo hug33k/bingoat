@@ -2,6 +2,9 @@ from typing import List, Union
 from fastapi import APIRouter, status, HTTPException, Depends
 from database import get_session, select, Session
 from database.models import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates, States
+from .cells import get_cell_states
+from .zones import get_zone_states
+from .states import generate_grid_state
 
 
 router = APIRouter(
@@ -60,10 +63,23 @@ async def remove_grid(grid_id: int):
 		session.commit()
 		return
 
+@router.post("/{grid_id}/publish", response_model=GridRead)
+async def publish_grid(grid_id: int):
+	with get_session() as session:
+		grid = session.get(Grids, grid_id)
+		if (not grid):
+			raise HTTPException(status_code=404, detail="Grid not found")
+		if (grid.published):
+			raise HTTPException(status_code=403, detail="Grid already published")
+		grid.published = True
+		session.add(grid)
+		session.commit()
+		session.refresh(grid)
+		return grid
 
-@router.get("/state/{grid_id}", response_model=GridReadWithStates)
+
+@router.get("/{grid_id}/state", response_model=GridReadWithStates)
 async def get_grid_states(grid_id: int, user:Union[str, None] = None, session: Session = Depends(get_session)):
-	print(user, grid_id)
 	grid = session.get(Grids, grid_id)
 	if (not grid):
 		raise HTTPException(status_code=404, detail="Grid not found")
@@ -73,3 +89,39 @@ async def get_grid_states(grid_id: int, user:Union[str, None] = None, session: S
 		statement = statement.where(States.user == user)
 	states = session.exec(statement)
 	return { "grid": grid, "states": states.all() }
+
+
+@router.post("/{grid_id}/state/generate", response_model=GridReadWithStates, status_code=status.HTTP_201_CREATED)
+async def generate_grid_states(grid_id: int, user:str, session: Session = Depends(get_session)):
+	await generate_grid_state(grid_id, user, session)
+	return await get_grid_states(grid_id, user, session)
+
+
+async def check_grid(grid_id: int, user: str):
+	with get_session() as session:
+		grid = session.get(Grids, grid_id)
+		status = True
+		for cell in grid.cells:
+			res = await get_cell_states(cell.id, user, session)
+			states = res["states"]
+			for state in states:
+				if (not state.status):
+					status = False
+		for zone in grid.zones:
+			res = await get_zone_states(zone.id, user, session)
+			states = res["states"]
+			for state in states:
+				if (not state.status):
+					status = False
+		res = await get_grid_states(grid_id, user, session)
+		states = res["states"]
+		updated = []
+		for state in states:
+			if (state.status != status):
+				updated.append(state)
+			state.status = status
+			session.add(state)
+		session.commit()
+		for state in states:
+			session.refresh(state)
+		return updated

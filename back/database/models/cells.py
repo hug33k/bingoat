@@ -1,6 +1,8 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
+from pydantic import BaseModel
 from .cellszoneslink import CellsZonesLink
+from .state import StateRead
 
 
 class CellBase(SQLModel):
@@ -18,7 +20,8 @@ class Cells(CellBase, table=True):
 
 
 class CellCreate(CellBase):
-	pass
+	grid_id: int
+	zones: List[int]
 
 
 class CellRead(CellBase):
@@ -31,6 +34,7 @@ class CellUpdate(SQLModel):
 	position_x: Optional[int] = None
 	position_y: Optional[int] = None
 	grid_id: Optional[int] = None
+	zones: Optional[List[int]] = None
 
 
 class CellReadWithRelations(CellRead):
@@ -40,3 +44,8 @@ class CellReadWithRelations(CellRead):
 
 class CellIdOnly(SQLModel):
 	id: int
+
+
+class CellReadWithStates(BaseModel):
+	cell: CellRead
+	states: List[StateRead]

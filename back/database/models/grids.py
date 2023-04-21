@@ -1,11 +1,12 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
-from .state import StateRead, StateUpdate
+from .state import StateRead
 
 
 class GridBase(SQLModel):
 	name: str
+	published: bool
 
 
 class Grids(GridBase, table=True):
@@ -24,6 +25,7 @@ class GridRead(GridBase):
 
 class GridUpdate(SQLModel):
 	name: Optional[str] = None
+	published: Optional[bool] = None
 
 
 class GridReadWithRelations(GridRead):

@@ -23,8 +23,5 @@ class StateRead(StateBase):
 
 
 class StateUpdate(SQLModel):
-	user: Optional[str] = None
 	status: Optional[bool] = None
 	marker: Optional[str] = None
-	entity_type: Optional[str] = None
-	entity_id: Optional[int] = None

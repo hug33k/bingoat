@@ -1,5 +1,7 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
+from pydantic import BaseModel
+from .state import StateRead
 from .cellszoneslink import CellsZonesLink
 
 
@@ -14,8 +16,10 @@ class Zones(ZoneBase, table=True):
 	grid: Optional["Grids"] = Relationship(back_populates="zones")
 	cells: List["Cells"] = Relationship(back_populates="zones", link_model=CellsZonesLink)
 
+
 class ZoneCreate(ZoneBase):
-	pass
+	grid_id: int
+	cells: List[int]
 
 
 class ZoneRead(ZoneBase):
@@ -26,6 +30,7 @@ class ZoneUpdate(SQLModel):
 	name: Optional[str] = None
 	points: Optional[int] = None
 	grid_id: Optional[int] = None
+	cells: Optional[List[int]] = None
 
 
 class ZoneReadWithRelations(ZoneRead):
@@ -35,3 +40,8 @@ class ZoneReadWithRelations(ZoneRead):
 
 class ZoneReadWithCells(ZoneRead):
 	cells: List["CellIdOnly"]
+
+
+class ZoneReadWithStates(BaseModel):
+	zone: ZoneRead
+	states: List[StateRead]

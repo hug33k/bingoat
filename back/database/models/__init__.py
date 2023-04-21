@@ -1,6 +1,6 @@
 from .grids import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates
-from .cells import CellCreate, CellRead, CellUpdate, Cells, CellReadWithRelations, CellIdOnly
-from .zones import ZoneCreate, ZoneRead, ZoneUpdate, Zones, ZoneReadWithRelations, ZoneReadWithCells
+from .cells import CellCreate, CellRead, CellUpdate, Cells, CellReadWithRelations, CellIdOnly, CellReadWithStates
+from .zones import ZoneCreate, ZoneRead, ZoneUpdate, Zones, ZoneReadWithRelations, ZoneReadWithCells, ZoneReadWithStates
 from .cellszoneslink import CellsZonesLink
 from .state import StateCreate, StateRead, StateUpdate, States
 
@@ -11,8 +11,8 @@ ZoneReadWithCells.update_forward_refs(CellIdOnly=CellIdOnly)
 
 __all__ = [
 	GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates,
-	CellCreate, CellRead, CellUpdate, Cells, CellReadWithRelations,
-	ZoneCreate, ZoneRead, ZoneUpdate, Zones, ZoneReadWithRelations,
+	CellCreate, CellRead, CellUpdate, Cells, CellReadWithRelations, CellReadWithStates,
+	ZoneCreate, ZoneRead, ZoneUpdate, Zones, ZoneReadWithRelations, ZoneReadWithStates,
 	CellsZonesLink,
 	StateCreate, StateRead, StateUpdate, States
 ]

@@ -1,10 +1,11 @@
 from typing import List, Union
 from fastapi import APIRouter, status, HTTPException, Depends
 from database import get_session, select, Session
-from database.models import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates, States
+from database.models import GridCreate, GridRead, GridUpdate, Grids, GridReadWithRelations, GridReadWithStates, States, Users, Invites, InviteRead
 from .cells import get_cell_states
 from .zones import get_zone_states
 from .states import generate_grid_state
+from .invites import add_invite, accept_invite, refuse_invite
 
 
 router = APIRouter(
@@ -78,23 +79,62 @@ async def publish_grid(grid_id: int):
 		return grid
 
 
+@router.post("/{grid_id}/invite", response_model=InviteRead)
+async def invite_user_to_grid(grid_id: int, user_id:int):
+	with get_session() as session:
+		grid = session.get(Grids, grid_id)
+		if (not grid):
+			raise HTTPException(status_code=404, detail="Grid not found")
+		if (not grid.published):
+			raise HTTPException(status_code=403, detail="Grid not published")
+		user = session.get(Users, user_id)
+		if (not user):
+			raise HTTPException(status_code=404, detail="User not found")
+		invite = Invites(desc=f"Invitation à la grille {grid.name}", grid_id=grid.id, author_id=grid.owner_id, guest_id=user_id)
+		return await add_invite(invite)
+
+
+@router.post("/{grid_id}/invite/accept", response_model=InviteRead)
+async def accept_invite_to_grid(grid_id: int, invitation_id:int):
+	with get_session() as session:
+		grid = session.get(Grids, grid_id)
+		if (not grid):
+			raise HTTPException(status_code=404, detail="Grid not found")
+		if (not grid.published):
+			raise HTTPException(status_code=403, detail="Grid not published")
+		response = await accept_invite(invitation_id)
+		await generate_grid_states(grid_id, response.guest_id, session)
+		return response
+
+
+@router.post("/{grid_id}/invite/refuse", response_model=InviteRead)
+async def refuse_invite_to_grid(grid_id: int, invitation_id:int):
+	with get_session() as session:
+		grid = session.get(Grids, grid_id)
+		if (not grid):
+			raise HTTPException(status_code=404, detail="Grid not found")
+		if (not grid.published):
+			raise HTTPException(status_code=403, detail="Grid not published")
+		return await refuse_invite(invitation_id)
+
+
 @router.get("/{grid_id}/state", response_model=GridReadWithStates)
-async def get_grid_states(grid_id: int, user:Union[str, None] = None, session: Session = Depends(get_session)):
+async def get_grid_states(grid_id: int, user_id:Union[int, None] = None, session: Session = Depends(get_session)):
 	grid = session.get(Grids, grid_id)
 	if (not grid):
 		raise HTTPException(status_code=404, detail="Grid not found")
 	statement = select(States).where(States.entity_type == "grid",
 									States.entity_id == grid_id)
-	if (user is not None):
-		statement = statement.where(States.user == user)
+	if (user_id is not None):
+		statement = statement.where(States.user_id == user_id)
 	states = session.exec(statement)
 	return { "grid": grid, "states": states.all() }
 
 
 @router.post("/{grid_id}/state/generate", response_model=GridReadWithStates, status_code=status.HTTP_201_CREATED)
-async def generate_grid_states(grid_id: int, user:str, session: Session = Depends(get_session)):
-	await generate_grid_state(grid_id, user, session)
-	return await get_grid_states(grid_id, user, session)
+async def generate_grid_states(grid_id: int, user_id:int, session: Session = Depends(get_session)):
+	await generate_grid_state(grid_id, user_id, session)
+	return await get_grid_states(grid_id, user_id, session)
 
 
 async def check_grid(grid_id: int, user: str):

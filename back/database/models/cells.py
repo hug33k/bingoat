@@ -2,7 +2,7 @@ from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
 from .cellszoneslink import CellsZonesLink
-from .state import StateRead
+from .states import StateRead
 
 
 class CellBase(SQLModel):

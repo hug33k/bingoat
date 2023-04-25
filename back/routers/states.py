@@ -3,7 +3,7 @@ from typing import List, Union
 from fastapi import APIRouter, status, HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
 from database import get_session, select, Session
-from database.models import StateCreate, StateRead, StateUpdate, States, Cells, Zones, Grids
+from database.models import StateCreate, StateRead, StateUpdate, States, Cells, Zones, Grids, StateReadWithRelations
 from websocket.manager import get_manager
 
 
@@ -25,7 +25,7 @@ async def get_states():
 
 
 # Make it private
-@router.get("/{state_id}", response_model=Union[StateRead, None])
+@router.get("/{state_id}", response_model=Union[StateReadWithRelations, None])
 async def get_state(state_id: int, session: Session = Depends(get_session)):
 	state = session.get(States, state_id)
 	if (not state):
@@ -106,11 +106,11 @@ async def check_state_parents(state: StateRead):
 			await ws_manager.broadcast(grid_id, json.dumps(jsonable_encoder(update)))
 
 
-async def generate_grid_state(grid_id: int, user:str, session: Session = Depends(get_session)):
+async def generate_grid_state(grid_id: int, user_id:int, session: Session = Depends(get_session)):
 	async def check_if_entity_state_exists(entity_type, entity_id):
 		existing_entity_state_statement = select(States).where(States.entity_type == entity_type,
 															States.entity_id == entity_id,
-															States.user == user)
+															States.user_id == user_id)
 		existing_entity_state = session.exec(existing_entity_state_statement).all()
 		return bool(len(existing_entity_state))
 
@@ -120,7 +120,7 @@ async def generate_grid_state(grid_id: int, user:str, session: Session = Depends
 
 	grid_exists = await check_if_entity_state_exists("grid", grid.id)
 	if (not grid_exists):
-		grid_state = States(user=user, status=False, marker="", entity_type="grid", entity_id=grid.id)
+		grid_state = States(user_id=user_id, status=False, marker="", entity_type="grid", entity_id=grid.id)
 		await add_state(grid_state)
 
 	cells_statement = select(Cells).where(Cells.grid_id == grid.id)
@@ -128,7 +128,7 @@ async def generate_grid_state(grid_id: int, user:str, session: Session = Depends
 	for cell in cells:
 		cell_exists = await check_if_entity_state_exists("cell", cell.id)
 		if (not cell_exists):
-			cell_state = States(user=user, status=False, marker="", entity_type="cell", entity_id=cell.id)
+			cell_state = States(user_id=user_id, status=False, marker="", entity_type="cell", entity_id=cell.id)
 			await add_state(cell_state)
 
 	zones_statement = select(Zones).where(Zones.grid_id == grid.id)
@@ -136,5 +136,5 @@ async def generate_grid_state(grid_id: int, user:str, session: Session = Depends
 	for zone in zones:
 		zone_exists = await check_if_entity_state_exists("zone", zone.id)
 		if (not zone_exists):
-			zone_state = States(user=user, status=False, marker="", entity_type="zone", entity_id=zone.id)
+			zone_state = States(user_id=user_id, status=False, marker="", entity_type="zone", entity_id=zone.id)
 			await add_state(zone_state)

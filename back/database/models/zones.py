@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
-from .state import StateRead
+from .states import StateRead
 from .cellszoneslink import CellsZonesLink
 
 

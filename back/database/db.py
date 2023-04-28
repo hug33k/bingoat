@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, create_engine, Session
+from sqlmodel.pool import StaticPool
 from . import models
 from . import dump
 
@@ -11,7 +12,7 @@ def get_dabatase(path="database/"):
 	if (db is None):
 		databaseFile = "db.sqlite"
 		sqliteUrl = f"sqlite:///{path}{databaseFile}"
-		db = create_engine(sqliteUrl, echo=True)
+		db = create_engine(sqliteUrl, connect_args={"check_same_thread": False}, poolclass=StaticPool)
 	return db
 
 

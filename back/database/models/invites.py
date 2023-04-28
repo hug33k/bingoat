@@ -27,9 +27,9 @@ class InviteRead(InviteBase):
 
 
 class InviteReadWithRelations(InviteRead):
-	grid: Optional["GridRead"] = []
-	author: Optional["UserRead"] = []
-	guest: Optional["UserRead"] = []
+	grid: Optional["GridRead"] = None
+	author: Optional["UserRead"] = None
+	guest: Optional["UserRead"] = None
 
 
 class InviteUpdate(SQLModel):

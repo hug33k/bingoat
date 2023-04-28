@@ -12,8 +12,8 @@ class Users(UserBase, table=True):
 	id: Optional[int] = Field(default=None, primary_key=True)
 	grids: List["Grids"] = Relationship(back_populates="owner")
 	states: List["States"] = Relationship(back_populates="user")
-	invites_sent: List["Invites"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.author_id", "lazy": "select"})
-	invites_received: List["Invites"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.guest_id", "lazy": "select"})
+	invites_sent: List["Invites"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.author_id", "lazy": "select", "viewonly": True})
+	invites_received: List["Invites"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.guest_id", "lazy": "select", "viewonly": True})
 
 
 class UserCreate(UserBase):

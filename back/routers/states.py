@@ -59,9 +59,13 @@ async def update_state(input_state: StateUpdate, state_id: int, session: Session
 		session.refresh(state)
 		return state
 	except Exception as e:
-		raise HTTPException(status_code=500, detail=f"Error while updating state: ${e}")
+		if (type(e) == HTTPException):
+			raise e
+		else:
+			raise HTTPException(status_code=500, detail=f"Error while updating state: {str(e)}")
 	finally:
-		await check_state_parents(state)
+		if (state):
+			await check_state_parents(state)
 
 
 # Make it private

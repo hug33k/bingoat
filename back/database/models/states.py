@@ -21,6 +21,7 @@ class StateCreate(StateBase):
 
 class StateRead(StateBase):
 	id: int
+	user_id: int
 
 
 class StateReadWithRelations(StateRead):

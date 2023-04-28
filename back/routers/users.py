@@ -43,6 +43,8 @@ async def update_user(input_user: UserUpdate, user_id: int):
 			raise HTTPException(status_code=404, detail="User not found")
 		input_user_dict = input_user.dict(exclude_unset=True)
 		for key, value in input_user_dict.items():
+			if not value:
+				continue
 			setattr(user, key, value)
 		session.add(user)
 		session.commit()

@@ -43,6 +43,8 @@ async def update_invite(input_invite: InviteUpdate, invite_id: int):
 			raise HTTPException(status_code=404, detail="Invite not found")
 		input_invite_dict = input_invite.dict(exclude_unset=True)
 		for key, value in input_invite_dict.items():
+			if not value and key != "accepted":
+				continue
 			setattr(invite, key, value)
 		session.add(invite)
 		session.commit()

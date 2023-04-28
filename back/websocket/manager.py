@@ -1,4 +1,3 @@
-from typing import List, Dict
 from fastapi import WebSocket
 
 
@@ -6,7 +5,7 @@ class Manager:
 	_instance = None
 
 	def __init__(self):
-		self._connections: Dict[int, List[WebSocket]] = {}
+		self._connections: dict[int, list[WebSocket]] = {}
 
 
 	@staticmethod

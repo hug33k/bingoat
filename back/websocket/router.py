@@ -20,4 +20,4 @@ async def websocket(grid_id: int, ws: WebSocket):
 			await manager.send_personal_message(f"You wrote: {data}", ws)
 	except WebSocketDisconnect:
 		manager.disconnect(ws, grid_id)
-		await manager.broadcast(grid_id, f"Client left the chat")
+		await manager.broadcast(grid_id, "Client left the chat")

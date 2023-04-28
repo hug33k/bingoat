@@ -20,7 +20,7 @@ async def get_users():
 @router.get("/{user_id}", response_model=Union[UserReadWithRelations, None])
 async def get_user(user_id: int, session: Session = Depends(get_session)):
 	user = session.get(Users, user_id)
-	if (not user):
+	if not user:
 		raise HTTPException(status_code=404, detail="User not found")
 	return user
 
@@ -39,7 +39,7 @@ async def add_user(input_user: UserCreate):
 async def update_user(input_user: UserUpdate, user_id: int):
 	with get_session() as session:
 		user = session.get(Users, user_id)
-		if (not user):
+		if not user:
 			raise HTTPException(status_code=404, detail="User not found")
 		input_user_dict = input_user.dict(exclude_unset=True)
 		for key, value in input_user_dict.items():
@@ -56,7 +56,7 @@ async def update_user(input_user: UserUpdate, user_id: int):
 async def remove_user(user_id: int):
 	with get_session() as session:
 		user = session.get(Users, user_id)
-		if (not user):
+		if not user:
 			raise HTTPException(status_code=404, detail="User not found")
 		session.delete(user)
 		session.commit()

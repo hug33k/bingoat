@@ -20,7 +20,7 @@ async def get_invites():
 @router.get("/{invite_id}", response_model=Union[InviteReadWithRelations, None])
 async def get_invite(invite_id: int, session: Session = Depends(get_session)):
 	invite = session.get(Invites, invite_id)
-	if (not invite):
+	if not invite:
 		raise HTTPException(status_code=404, detail="Invite not found")
 	return invite
 
@@ -39,7 +39,7 @@ async def add_invite(input_invite: InviteCreate):
 async def update_invite(input_invite: InviteUpdate, invite_id: int):
 	with get_session() as session:
 		invite = session.get(Invites, invite_id)
-		if (not invite):
+		if not invite:
 			raise HTTPException(status_code=404, detail="Invite not found")
 		input_invite_dict = input_invite.dict(exclude_unset=True)
 		for key, value in input_invite_dict.items():
@@ -56,7 +56,7 @@ async def update_invite(input_invite: InviteUpdate, invite_id: int):
 async def accept_invite(invite_id: int):
 	with get_session() as session:
 		invite = session.get(Invites, invite_id)
-		if (not invite):
+		if not invite:
 			raise HTTPException(status_code=404, detail="Invite not found")
 		setattr(invite, "accepted", True)
 		session.add(invite)
@@ -69,7 +69,7 @@ async def accept_invite(invite_id: int):
 async def refuse_invite(invite_id: int):
 	with get_session() as session:
 		invite = session.get(Invites, invite_id)
-		if (not invite):
+		if not invite:
 			raise HTTPException(status_code=404, detail="Invite not found")
 		setattr(invite, "accepted", False)
 		session.add(invite)
@@ -82,7 +82,7 @@ async def refuse_invite(invite_id: int):
 async def remove_invite(invite_id: int):
 	with get_session() as session:
 		invite = session.get(Invites, invite_id)
-		if (not invite):
+		if not invite:
 			raise HTTPException(status_code=404, detail="Invite not found")
 		session.delete(invite)
 		session.commit()

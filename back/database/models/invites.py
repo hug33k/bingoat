@@ -12,9 +12,13 @@ class Invites(InviteBase, table=True):
 	grid_id: Optional[int] = Field(default=None, foreign_key="grids.id")
 	grid: Optional["Grids"] = Relationship(back_populates="invites")
 	author_id: Optional[int] = Field(default=None, foreign_key="users.id")
-	author: Optional["Users"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.author_id", "lazy": "select"})
+	author: Optional["Users"] = Relationship(sa_relationship_kwargs={
+												"primaryjoin": "Users.id==Invites.author_id",
+												"lazy": "select"})
 	guest_id: Optional[int] = Field(default=None, foreign_key="users.id")
-	guest: Optional["Users"] = Relationship(sa_relationship_kwargs={"primaryjoin": "Users.id==Invites.guest_id", "lazy": "select"})
+	guest: Optional["Users"] = Relationship(sa_relationship_kwargs={
+												"primaryjoin": "Users.id==Invites.guest_id",
+												"lazy": "select"})
 
 
 class InviteCreate(InviteBase):

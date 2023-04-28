@@ -1,6 +1,5 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
-from pydantic import BaseModel
 from .states import StateRead
 from .cellszoneslink import CellsZonesLink
 
@@ -43,6 +42,6 @@ class ZoneReadWithCells(ZoneRead):
 	cells: List["CellIdOnly"]
 
 
-class ZoneReadWithStates(BaseModel):
+class ZoneReadWithStates(SQLModel):
 	zone: ZoneRead
 	states: List[StateRead]

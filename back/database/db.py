@@ -8,11 +8,11 @@ class Database:
 
 
 	@staticmethod
-	def get_instance(path="database/"):
+	def get_instance(path="database/", database_file="db.sqlite"):
 		if Database._instance is None :
-			databaseFile = "db.sqlite"
-			sqliteUrl = f"sqlite:///{path}{databaseFile}"
-			Database._instance = create_engine(sqliteUrl, connect_args={"check_same_thread": False}, poolclass=StaticPool)
+			Database._instance = create_engine(f"sqlite:///{path}{database_file}",
+												connect_args={"check_same_thread": False},
+												poolclass=StaticPool)
 		return Database._instance
 
 

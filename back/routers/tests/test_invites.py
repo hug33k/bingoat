@@ -46,17 +46,17 @@ def test_get_invite__success():
 
 
 def test_get_invite__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.get("/invites/one")
 	assert """path -> invite_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_get_invite__invite_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.get("/invites/100")
-	assert e.value.status_code == 404
-	assert e.value.detail == "Invite not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "Invite not found"
 
 
 def test_add_invite__success():
@@ -90,13 +90,13 @@ def test_add_invite__invalid_payload():
 		"accepted": 42,
 		"fake_field": "fake_data"
 	}
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/invites", json=payload)
 	assert """2 validation errors for Request
 body -> desc
   none is not an allowed value (type=type_error.none.not_allowed)
 body -> accepted
-  value could not be parsed to a boolean (type=type_error.bool)""" in str(e.value)
+  value could not be parsed to a boolean (type=type_error.bool)""" in str(exception.value)
 
 
 def test_update_invite__success():
@@ -115,21 +115,21 @@ def test_update_invite__success():
 
 
 def test_update_invite__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/invites/one", json={})
 	assert """path -> invite_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_update_invite__invite_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		payload = {
 			"desc": "description",
 			"accepted": True
 		}
 		client.post("/invites/10000000000", json=payload)
-	assert e.value.status_code == 404
-	assert e.value.detail == "Invite not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "Invite not found"
 
 
 def test_update_invalid__invalid_payload():
@@ -138,11 +138,11 @@ def test_update_invalid__invalid_payload():
 		"accepted": 42,
 		"fake_field": "fake_data"
 	}
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/invites/1", json=payload)
 	assert """1 validation error for Request
 body -> accepted
-  value could not be parsed to a boolean (type=type_error.bool)""" in str(e.value)
+  value could not be parsed to a boolean (type=type_error.bool)""" in str(exception.value)
 
 
 def test_remove_invite():
@@ -159,17 +159,17 @@ def test_remove_invite():
 
 
 def test_remove_invite__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.delete("/invites/one")
 	assert """path -> invite_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_remove_invite__invite_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.delete("/invites/10000000000")
-	assert e.value.status_code == 404
-	assert e.value.detail == "Invite not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "Invite not found"
 
 
 def test_accept_invite__success():
@@ -181,10 +181,10 @@ def test_accept_invite__success():
 
 
 def test_accept_invite__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/invites/one", json={})
 	assert """path -> invite_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_refuse_invite__success():
@@ -196,7 +196,7 @@ def test_refuse_invite__success():
 
 
 def test_refuse_invite__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/invites/one", json={})
 	assert """path -> invite_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)

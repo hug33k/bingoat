@@ -5,7 +5,7 @@ class Manager:
 	_instance = None
 
 	def __init__(self):
-		self._connections: dict[int, list[WebSocket]] = {}
+		self._connections: dict(int, list(WebSocket)) = {}
 
 
 	@staticmethod
@@ -17,7 +17,7 @@ class Manager:
 
 	async def connect(self, websocket: WebSocket, grid: int):
 		await websocket.accept()
-		if (grid not in self._connections):
+		if grid not in self._connections:
 			self._connections[grid] = []
 		self._connections[grid].append(websocket)
 
@@ -31,7 +31,7 @@ class Manager:
 
 
 	async def broadcast(self, grid: int, message: str):
-		if (grid not in self._connections):
+		if grid not in self._connections:
 			return
 		for connection in self._connections[grid]:
 			await connection.send_text(message)

@@ -1,12 +1,12 @@
 from datetime import datetime
 from fastapi import APIRouter, status
-from pydantic import BaseModel, Field
+from sqlmodel import Field, SQLModel
 
 
 router = APIRouter()
 
 
-class Status(BaseModel):
+class Status(SQLModel):
 	status: bool
 	date: datetime = Field(default_factory=datetime.utcnow)
 

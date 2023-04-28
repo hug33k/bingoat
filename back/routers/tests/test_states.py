@@ -44,17 +44,17 @@ def test_get_state__success():
 
 
 def test_get_state__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.get("/states/one")
 	assert """path -> state_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_get_state__state_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.get("/states/100")
-	assert e.value.status_code == 404
-	assert e.value.detail == "State not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "State not found"
 
 
 def test_add_state__success():
@@ -87,13 +87,13 @@ def test_add_state__invalid_payload():
 		"user_id": True,
 		"fake_field": "fake_data"
 	}
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/states", json=payload)
 	assert """2 validation errors for Request
 body -> status
   value could not be parsed to a boolean (type=type_error.bool)
 body -> entity_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_update_state__success():
@@ -112,21 +112,21 @@ def test_update_state__success():
 
 
 def test_update_state__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/states/one", json={})
 	assert """path -> state_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_update_state__state_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		payload = {
 			"status": True,
 			"marker": "updated_marker"
 		}
 		client.post("/states/10000000", json=payload)
-	assert e.value.status_code == 404
-	assert e.value.detail == "State not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "State not found"
 
 
 def test_update_invalid__invalid_payload():
@@ -134,11 +134,11 @@ def test_update_invalid__invalid_payload():
 		"status": "fake_status",
 		"marker": 42
 	}
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/states/1", json=payload)
 	assert """1 validation error for Request
 body -> status
-  value could not be parsed to a boolean (type=type_error.bool)""" in str(e.value)
+  value could not be parsed to a boolean (type=type_error.bool)""" in str(exception.value)
 
 
 def test_remove_state():
@@ -158,14 +158,14 @@ def test_remove_state():
 
 
 def test_remove_state__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.delete("/states/one")
 	assert """path -> state_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_remove_state__state_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.delete("/states/1000000000")
-	assert e.value.status_code == 404
-	assert e.value.detail == "State not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "State not found"

@@ -53,17 +53,17 @@ def test_get_user__success():
 
 
 def test_get_user__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.get("/users/one")
 	assert """path -> user_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_get_user__user_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.get("/users/100000000000")
-	assert e.value.status_code == 404
-	assert e.value.detail == "User not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "User not found"
 
 
 def test_add_user__success():
@@ -87,11 +87,11 @@ def test_add_user__invalid_payload():
 		"token": 42,
 		"fake_field": "fake_data"
 	}
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/users", json=payload)
 	assert """1 validation error for Request
 body -> name
-  none is not an allowed value (type=type_error.none.not_allowed)""" in str(e.value)
+  none is not an allowed value (type=type_error.none.not_allowed)""" in str(exception.value)
 
 
 def test_update_user__success():
@@ -110,21 +110,21 @@ def test_update_user__success():
 
 
 def test_update_user__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.post("/users/one", json={})
 	assert """path -> user_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_update_user__user_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		payload = {
 			"name": "name",
 			"token": "token"
 		}
 		client.post("/users/100000000000", json=payload)
-	assert e.value.status_code == 404
-	assert e.value.detail == "User not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "User not found"
 
 
 def test_update_user__invalid_payload():
@@ -157,14 +157,14 @@ def test_remove_user():
 
 
 def test_remove_user__invalid_path_parameter_type():
-	with pytest.raises(RequestValidationError) as e:
+	with pytest.raises(RequestValidationError) as exception:
 		client.delete("/users/one")
 	assert """path -> user_id
-  value is not a valid integer (type=type_error.integer)""" in str(e.value)
+  value is not a valid integer (type=type_error.integer)""" in str(exception.value)
 
 
 def test_remove_user__user_not_found():
-	with pytest.raises(HTTPException) as e:
+	with pytest.raises(HTTPException) as exception:
 		client.delete("/users/10000000000000")
-	assert e.value.status_code == 404
-	assert e.value.detail == "User not found"
+	assert exception.value.status_code == 404
+	assert exception.value.detail == "User not found"

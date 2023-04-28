@@ -8,16 +8,14 @@ router = APIRouter(
 )
 
 
-manager = Manager.get_instance()
-
-
 @router.websocket("/{grid_id}")
-async def websocket(grid_id: int, ws: WebSocket):
-	await manager.connect(ws, grid_id)
+async def handle_websocket(grid_id: int, websocket: WebSocket):
+	websocket_manager = Manager.get_instance()
+	await websocket_manager.connect(websocket, grid_id)
 	try:
 		while True:
-			data = await ws.receive_text()
-			await manager.send_personal_message(f"You wrote: {data}", ws)
+			data = await websocket.receive_text()
+			await websocket_manager.send_personal_message(f"You wrote: {data}", websocket)
 	except WebSocketDisconnect:
-		manager.disconnect(ws, grid_id)
-		await manager.broadcast(grid_id, "Client left the chat")
+		websocket_manager.disconnect(websocket, grid_id)
+		await websocket_manager.broadcast(grid_id, "Client left the chat")

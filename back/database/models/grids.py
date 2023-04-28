@@ -1,6 +1,5 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
-from pydantic import BaseModel
 from .states import StateRead
 
 
@@ -38,6 +37,6 @@ class GridReadWithRelations(GridRead):
 	owner: Optional["Users"] = None
 
 
-class GridReadWithStates(BaseModel):
+class GridReadWithStates(SQLModel):
 	grid: GridRead
 	states: List[StateRead]

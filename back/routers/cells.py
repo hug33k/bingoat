@@ -35,7 +35,7 @@ async def add_cell(input_cell: CellCreate):
 			raise HTTPException(status_code=404, detail="Grid not found")
 		if (grid.published):
 			raise HTTPException(status_code=403, detail="Grid already published")
-		if (input_cell.zones and len(input_cell.zones)):
+		if (input_cell.zones):
 			statement = select(Zones).where(Zones.id.in_(input_cell.zones))
 			zones = session.exec(statement).all()
 			cell.zones = zones

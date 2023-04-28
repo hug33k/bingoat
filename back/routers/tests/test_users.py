@@ -2,15 +2,15 @@ from fastapi.testclient import TestClient
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 import pytest
-from ..users import router
 from tests.misc import check_key_in_dict
+from ..users import router
 
 
 client = TestClient(router)
 
 
 def assert_user_read_class(user):
-	assert type(user) == dict
+	assert isinstance(user, dict)
 	check_key_in_dict(user, "id", int)
 	check_key_in_dict(user, "name", str)
 	check_key_in_dict(user, "token", str)
@@ -40,7 +40,7 @@ def test_get_users__success():
 	response = client.get("/users")
 	data = response.json()
 	assert response.status_code == 200
-	assert type(data) == list
+	assert isinstance(data, list)
 	for item in data:
 		assert_user_read_class(item)
 

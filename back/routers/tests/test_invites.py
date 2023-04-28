@@ -1,17 +1,16 @@
-from typing import Optional
 from fastapi.testclient import TestClient
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 import pytest
-from ..invites import router
 from tests.misc import check_key_in_dict
+from ..invites import router
 
 
 client = TestClient(router)
 
 
 def assert_invite_read_class(invite):
-	assert type(invite) == dict
+	assert isinstance(invite, dict)
 	check_key_in_dict(invite, "id", int)
 	check_key_in_dict(invite, "desc", str)
 	check_key_in_dict(invite, "accepted", bool, nullable=True)
@@ -34,7 +33,7 @@ def test_get_invites__success():
 	response = client.get("/invites")
 	data = response.json()
 	assert response.status_code == 200
-	assert type(data) == list
+	assert isinstance(data, list)
 	for item in data:
 		assert_invite_read_class(item)
 
@@ -70,7 +69,7 @@ def test_add_invite__success():
 	assert response.status_code == 201
 	assert_invite_read_class(data)
 	assert data["desc"] == payload["desc"]
-	assert data["accepted"] == None
+	assert not data["accepted"]
 	assert "fake_field" not in data
 
 	payload_bis = {
@@ -178,7 +177,7 @@ def test_accept_invite__success():
 	data = response.json()
 	assert response.status_code == 200
 	assert_invite_read_class(data)
-	assert data["accepted"] == True
+	assert data["accepted"]
 
 
 def test_accept_invite__invalid_path_parameter_type():
@@ -193,7 +192,7 @@ def test_refuse_invite__success():
 	data = response.json()
 	assert response.status_code == 200
 	assert_invite_read_class(data)
-	assert data["accepted"] == False
+	assert not data["accepted"]
 
 
 def test_refuse_invite__invalid_path_parameter_type():

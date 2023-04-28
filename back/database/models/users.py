@@ -1,6 +1,5 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
-from pydantic import BaseModel
 
 
 class UserBase(SQLModel):

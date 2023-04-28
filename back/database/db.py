@@ -1,23 +1,23 @@
 from sqlmodel import SQLModel, create_engine, Session
 from sqlmodel.pool import StaticPool
-from . import models
 from . import dump
 
 
-db = None
+class Database:
+	_instance = None
 
 
-def get_dabatase(path="database/"):
-	global db
-	if (db is None):
-		databaseFile = "db.sqlite"
-		sqliteUrl = f"sqlite:///{path}{databaseFile}"
-		db = create_engine(sqliteUrl, connect_args={"check_same_thread": False}, poolclass=StaticPool)
-	return db
+	@staticmethod
+	def get_instance(path="database/"):
+		if Database._instance is None :
+			databaseFile = "db.sqlite"
+			sqliteUrl = f"sqlite:///{path}{databaseFile}"
+			Database._instance = create_engine(sqliteUrl, connect_args={"check_same_thread": False}, poolclass=StaticPool)
+		return Database._instance
 
 
 def get_session():
-	return Session(get_dabatase())
+	return Session(Database.get_instance())
 
 
 def create_database_and_tables(engine):
@@ -25,7 +25,7 @@ def create_database_and_tables(engine):
 
 
 def init_db():
-	engine = get_dabatase()
+	engine = Database.get_instance()
 	create_database_and_tables(engine)
 	dump.inject(engine)
 

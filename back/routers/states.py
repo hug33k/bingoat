@@ -4,7 +4,7 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
 from database import get_session, select, Session
 from database.models import StateCreate, StateRead, StateUpdate, States, Cells, Zones, Grids, StateReadWithRelations
-from websocket.manager import get_manager
+from websocket.manager import Manager
 
 
 router = APIRouter(
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-ws_manager = get_manager()
+ws_manager = Manager.get_instance()
 
 
 # Make it private
@@ -58,11 +58,6 @@ async def update_state(input_state: StateUpdate, state_id: int, session: Session
 		session.commit()
 		session.refresh(state)
 		return state
-	except Exception as e:
-		if (type(e) == HTTPException):
-			raise e
-		else:
-			raise HTTPException(status_code=500, detail=f"Error while updating state: {str(e)}")
 	finally:
 		if (state):
 			await check_state_parents(state)
@@ -89,7 +84,7 @@ async def check_state_parents(state: StateRead):
 		if (state.entity_type == "cell"):
 			cell = session.get(Cells, state.entity_id)
 			grid_id = cell.grid_id
-			if (len(cell.zones)):
+			if (cell.zones):
 				for zone in cell.zones:
 					states = await check_zone(zone.id, state.user)
 					if (states):
@@ -97,7 +92,6 @@ async def check_state_parents(state: StateRead):
 			states = await check_grid(grid_id, state.user)
 			if (states):
 				updates.extend(states)
-			pass
 		elif (state.entity_type == "zone"):
 			zone = session.get(Zones, state.entity_id)
 			grid_id = zone.grid_id

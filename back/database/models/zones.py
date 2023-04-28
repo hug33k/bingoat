@@ -14,6 +14,7 @@ class Zones(ZoneBase, table=True):
 	id: Optional[int] = Field(default=None, primary_key=True)
 	grid_id: Optional[int] = Field(default=None, foreign_key="grids.id")
 	grid: Optional["Grids"] = Relationship(back_populates="zones")
+	# TODO: cells_id?
 	cells: List["Cells"] = Relationship(back_populates="zones", link_model=CellsZonesLink)
 
 

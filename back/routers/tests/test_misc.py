@@ -9,8 +9,8 @@ def test_get_status():
     response = client.get("/status")
     data = response.json()
     assert response.status_code == 200
-    assert type(data) == dict
+    assert isinstance(data, dict)
     assert "status" in data
-    assert data["status"] == True
+    assert data["status"]
     assert "date" in data
-    assert type(data["date"]) == str
+    assert isinstance(data["date"], str)

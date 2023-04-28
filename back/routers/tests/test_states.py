@@ -1,17 +1,16 @@
-from typing import Optional
 from fastapi.testclient import TestClient
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 import pytest
-from ..states import router
 from tests.misc import check_key_in_dict
+from ..states import router
 
 
 client = TestClient(router)
 
 
 def assert_state_read_class(state):
-	assert type(state) == dict
+	assert isinstance(state, dict)
 	check_key_in_dict(state, "id", int)
 	check_key_in_dict(state, "status", bool)
 	check_key_in_dict(state, "marker", str)
@@ -32,7 +31,7 @@ def test_get_states__success():
 	response = client.get("/states")
 	data = response.json()
 	assert response.status_code == 200
-	assert type(data) == list
+	assert isinstance(data, list)
 	for item in data:
 		assert_state_read_class(item)
 

@@ -1,52 +1,12 @@
 from sqlmodel import Session
-from .models import Grids, Cells, Zones, CellsZonesLink, States, Users, Invites
-
-
-main_grid = None
-
-main_grid_cell_1 = None
-main_grid_cell_2 = None
-main_grid_cell_3 = None
-
-main_grid_zone_1 = None
-main_grid_zone_2 = None
-
-
-
-
-other_grid = None
-
-other_grid_cell_1 = None
-other_grid_cell_2 = None
-other_grid_cell_3 = None
-
-other_grid_zone_1 = None
-other_grid_zone_2 = None
-
-other_grid_state = None
-
-other_grid_cell_1_state = None
-other_grid_cell_2_state = None
-other_grid_cell_3_state = None
-
-other_grid_zone_1_state = None
-other_grid_zone_2_state = None
-
-
-user_1 = None
-user_2 = None
-user_3 = None
+from .models import Grids, Cells, Zones, States, Users, Invites
 
 
 def inject_users(session):
-    global user_1, user_2, user_3
-    user_1 = Users(name="Utilisateur", token="user1")
-    user_2 = Users(name="Dev", token="user2")
-    user_3 = Users(name="Admin", token="user3")
     users = [
-        user_1,
-        user_2,
-        user_3
+        Users(name="Utilisateur", token="user1"),
+        Users(name="Dev", token="user2"),
+        Users(name="Admin", token="user3")
     ]
     for user in users:
         session.add(user)
@@ -56,13 +16,10 @@ def inject_users(session):
     return users
 
 
-def inject_grids(session):
-    global main_grid, other_grid
-    main_grid = Grids(name="Main grid", published=False, cells=[], owner_id=user_1.id)
-    other_grid = Grids(name="Other grid", published=True, cells=[], owner_id=user_2.id)
+def inject_grids(session, users):
     grids = [
-        main_grid,
-        other_grid
+        Grids(name="Main grid", published=False, cells=[], owner_id=users[0].id),
+        Grids(name="Other grid", published=True, cells=[], owner_id=users[1].id)
     ]
     for grid in grids:
         session.add(grid)
@@ -73,20 +30,13 @@ def inject_grids(session):
 
 
 def inject_cells(session, grids):
-    global main_grid_cell_1, main_grid_cell_2, main_grid_cell_3, other_grid_cell_1, other_grid_cell_2, other_grid_cell_3
-    main_grid_cell_1 = Cells(name="Cell 1", position_x=0, position_y=0, points=21, grid_id=main_grid.id)
-    main_grid_cell_2 = Cells(name="Cell 2", position_x=0, position_y=1, points=42, grid_id=main_grid.id)
-    main_grid_cell_3 = Cells(name="Cell 3", position_x=0, position_y=2, points=84, grid_id=main_grid.id)
-    other_grid_cell_1 = Cells(name="Other Cell 1", position_x=0, position_y=0, points=21, grid_id=other_grid.id)
-    other_grid_cell_2 = Cells(name="Other Cell 2", position_x=0, position_y=1, points=42, grid_id=other_grid.id)
-    other_grid_cell_3 = Cells(name="Other Cell 3", position_x=0, position_y=2, points=84, grid_id=other_grid.id)
     cells = [
-        main_grid_cell_1,
-        main_grid_cell_2,
-        main_grid_cell_3,
-        other_grid_cell_1,
-        other_grid_cell_2,
-        other_grid_cell_3
+        Cells(name="Cell 2", position_x=0, position_y=1, points=42, grid_id=grids[0].id),
+        Cells(name="Cell 1", position_x=0, position_y=0, points=21, grid_id=grids[0].id),
+        Cells(name="Cell 3", position_x=0, position_y=2, points=84, grid_id=grids[0].id),
+        Cells(name="Other Cell 1", position_x=0, position_y=0, points=21, grid_id=grids[1].id),
+        Cells(name="Other Cell 2", position_x=0, position_y=1, points=42, grid_id=grids[1].id),
+        Cells(name="Other Cell 3", position_x=0, position_y=2, points=84, grid_id=grids[1].id)
     ]
     for cell in cells:
         session.add(cell)
@@ -97,16 +47,11 @@ def inject_cells(session, grids):
 
 
 def inject_zones(session, grids, cells):
-    global main_grid_zone_1, main_grid_zone_2, other_grid_zone_1, other_grid_zone_2
-    main_grid_zone_1 = Zones(name="Zone 1", points=3, grid_id=main_grid.id, cells=[main_grid_cell_1, main_grid_cell_2])
-    main_grid_zone_2 = Zones(name="Zone 2", points=3, grid_id=main_grid.id, cells=[main_grid_cell_2, main_grid_cell_3])
-    other_grid_zone_1 = Zones(name="Other Zone 1", points=3, grid_id=other_grid.id, cells=[other_grid_cell_1, other_grid_cell_2])
-    other_grid_zone_2 = Zones(name="Other Zone 2", points=3, grid_id=other_grid.id, cells=[other_grid_cell_2, other_grid_cell_3])
     zones = [
-        main_grid_zone_1,
-        main_grid_zone_2,
-        other_grid_zone_1,
-        other_grid_zone_2
+        Zones(name="Zone 1", points=3, grid_id=grids[0].id, cells=[cells[0].id, cells[1]]),
+        Zones(name="Zone 2", points=3, grid_id=grids[0].id, cells=[cells[1], cells[2]]),
+        Zones(name="Other Zone 1", points=3, grid_id=grids[1].id, cells=[cells[3], cells[4]]),
+        Zones(name="Other Zone 2", points=3, grid_id=grids[1].id, cells=[cells[4], cells[5]])
     ]
     for zone in zones:
         session.add(zone)
@@ -116,24 +61,15 @@ def inject_zones(session, grids, cells):
     return zones
 
 
-def inject_states(session):
-    global other_grid_state, other_grid_cell_1_state, other_grid_cell_2_state, other_grid_cell_3_state, other_grid_zone_1_state, other_grid_zone_2_state
-    other_grid_state = States(user_id=user_1.id, status=False, marker="", entity_type="grid", entity_id=other_grid.id)
-
-    other_grid_cell_1_state = States(user_id=user_1.id, status=False, marker="", entity_type="cell", entity_id=other_grid_cell_1.id)
-    other_grid_cell_2_state = States(user_id=user_1.id, status=False, marker="", entity_type="cell", entity_id=other_grid_cell_2.id)
-    other_grid_cell_3_state = States(user_id=user_1.id, status=False, marker="", entity_type="cell", entity_id=other_grid_cell_3.id)
-
-    other_grid_zone_1_state = States(user_id=user_1.id, status=False, marker="", entity_type="zone", entity_id=other_grid_zone_1.id)
-    other_grid_zone_2_state = States(user_id=user_1.id, status=False, marker="", entity_type="zone", entity_id=other_grid_zone_2.id)
-
+def inject_states(session, users, grids, cells, zones):
     states = [
-        other_grid_state,
-        other_grid_cell_1_state,
-        other_grid_cell_2_state,
-        other_grid_cell_3_state,
-        other_grid_zone_1_state,
-        other_grid_zone_2_state
+        States(user_id=users[0].id, status=False, marker="", entity_type="grid", entity_id=grids[1].id),
+        States(user_id=users[0].id, status=False, marker="", entity_type="cell", entity_id=cells[3].id),
+        States(user_id=users[0].id, status=False, marker="", entity_type="cell", entity_id=cells[4].id),
+        States(user_id=users[0].id, status=False, marker="", entity_type="cell", entity_id=cells[5].id),
+        States(user_id=users[0].id, status=False, marker="", entity_type="zone", entity_id=zones[2].id),
+        States(user_id=users[0].id, status=False, marker="", entity_type="zone", entity_id=zones[3].id)
+
     ]
     for state in states:
         session.add(state)
@@ -141,14 +77,12 @@ def inject_states(session):
     return states
 
 
-def inject_invites(session):
-    invite_1 = Invites(desc="Invitation", grid_id=main_grid.id, author_id=user_1.id, guest_id=user_3.id)
-    invite_2 = Invites(desc="Invitation", grid_id=main_grid.id, author_id=user_1.id, guest_id=user_2.id)
-    invite_3 = Invites(desc="Invitation", grid_id=other_grid.id, author_id=user_2.id, guest_id=user_3.id)
+def inject_invites(session, users, grids):
+
     invites = [
-        invite_1,
-        invite_2,
-        invite_3
+        Invites(desc="Invitation", grid_id=grids[0].id, author_id=users[0].id, guest_id=users[2].id),
+        Invites(desc="Invitation", grid_id=grids[0].id, author_id=users[0].id, guest_id=users[1].id),
+        Invites(desc="Invitation", grid_id=grids[1].id, author_id=users[1].id, guest_id=users[2].id)
     ]
     for invite in invites:
         session.add(invite)
@@ -158,9 +92,9 @@ def inject_invites(session):
 def inject(engine):
     with Session(engine) as session:
         users = inject_users(session)
-        grids = inject_grids(session)
+        grids = inject_grids(session, users)
         cells = inject_cells(session, grids)
         zones = inject_zones(session, grids, cells)
-        states = inject_states(session)
-        invites = inject_invites(session)
+        inject_states(session, users, grids, cells, zones)
+        inject_invites(session, users, grids)
         session.close()

@@ -35,7 +35,7 @@ async def add_zone(input_zone: ZoneCreate):
 			raise HTTPException(status_code=404, detail="Grid not found")
 		if (grid.published):
 			raise HTTPException(status_code=403, detail="Grid already published")
-		if (input_zone.cells and len(input_zone.cells)):
+		if (input_zone.cells):
 			statement = select(Cells).where(Cells.id.in_(input_zone.cells))
 			cells = session.exec(statement).all()
 			zone.cells = cells
@@ -99,20 +99,20 @@ async def get_zone_states(zone_id: int, user:Union[str, None] = None, session: S
 async def check_zone(zone_id: int, user:str):
 	with get_session() as session:
 		zone = session.get(Zones, zone_id)
-		status = True
+		state_status = True
 		for cell in zone.cells:
 			res = await get_cell_states(cell.id, user, session)
 			states = res["states"]
 			for state in states:
 				if (not state.status):
-					status = False
+					state_status = False
 		res = await get_zone_states(zone_id, user, session)
 		states = res["states"]
 		updated = []
 		for state in states:
-			if (state.status != status):
+			if (state.status != state_status):
 				updated.append(state)
-			state.status = status
+				state.status = state_status
 			session.add(state)
 		session.commit()
 		for state in states:

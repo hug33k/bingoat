@@ -139,27 +139,27 @@ async def generate_grid_states(grid_id: int, user_id:int, session: Session = Dep
 
 async def check_grid(grid_id: int, user: str):
 	with get_session() as session:
+		state_status = True
 		grid = session.get(Grids, grid_id)
-		status = True
 		for cell in grid.cells:
 			res = await get_cell_states(cell.id, user, session)
 			states = res["states"]
 			for state in states:
 				if (not state.status):
-					status = False
+					state_status = False
 		for zone in grid.zones:
 			res = await get_zone_states(zone.id, user, session)
 			states = res["states"]
 			for state in states:
 				if (not state.status):
-					status = False
+					state_status = False
 		res = await get_grid_states(grid_id, user, session)
 		states = res["states"]
 		updated = []
 		for state in states:
-			if (state.status != status):
+			if (state.status != state_status):
 				updated.append(state)
-			state.status = status
+				state.status = state_status
 			session.add(state)
 		session.commit()
 		for state in states:

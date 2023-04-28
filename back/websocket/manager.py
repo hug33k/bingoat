@@ -1,13 +1,19 @@
-from typing import List
+from typing import List, Dict
 from fastapi import WebSocket
 
 
-manager = None
-
-
 class Manager:
+	_instance = None
+
 	def __init__(self):
 		self._connections: Dict[int, List[WebSocket]] = {}
+
+
+	@staticmethod
+	def get_instance():
+		if Manager._instance is None :
+			Manager._instance = Manager()
+		return Manager._instance
 
 
 	async def connect(self, websocket: WebSocket, grid: int):
@@ -30,10 +36,3 @@ class Manager:
 			return
 		for connection in self._connections[grid]:
 			await connection.send_text(message)
-
-
-def get_manager():
-	global manager
-	if (manager is None):
-		manager = Manager()
-	return manager

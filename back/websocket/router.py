@@ -1,6 +1,5 @@
-import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from .manager import get_manager
+from .manager import Manager
 
 
 router = APIRouter(
@@ -9,16 +8,16 @@ router = APIRouter(
 )
 
 
-manager = get_manager()
+manager = Manager.get_instance()
 
 
 @router.websocket("/{grid_id}")
-async def websocket(grid_id: int, websocket: WebSocket):
-	await manager.connect(websocket, grid_id)
+async def websocket(grid_id: int, ws: WebSocket):
+	await manager.connect(ws, grid_id)
 	try:
 		while True:
-			data = await websocket.receive_text()
-			await manager.send_personal_message(f"You wrote: {data}", websocket)
+			data = await ws.receive_text()
+			await manager.send_personal_message(f"You wrote: {data}", ws)
 	except WebSocketDisconnect:
-		manager.disconnect(websocket, grid_id)
-		await manager.broadcast(f"Client left the chat")
+		manager.disconnect(ws, grid_id)
+		await manager.broadcast(grid_id, f"Client left the chat")

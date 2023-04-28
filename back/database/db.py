@@ -28,7 +28,3 @@ def init_db():
 	engine = Database.get_instance()
 	create_database_and_tables(engine)
 	dump.inject(engine)
-
-
-if __name__ == "__main__":
-	init_db()

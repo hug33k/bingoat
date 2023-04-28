@@ -48,7 +48,7 @@ def inject_cells(session, grids):
 
 def inject_zones(session, grids, cells):
     zones = [
-        Zones(name="Zone 1", points=3, grid_id=grids[0].id, cells=[cells[0].id, cells[1]]),
+        Zones(name="Zone 1", points=3, grid_id=grids[0].id, cells=[cells[0], cells[1]]),
         Zones(name="Zone 2", points=3, grid_id=grids[0].id, cells=[cells[1], cells[2]]),
         Zones(name="Other Zone 1", points=3, grid_id=grids[1].id, cells=[cells[3], cells[4]]),
         Zones(name="Other Zone 2", points=3, grid_id=grids[1].id, cells=[cells[4], cells[5]])

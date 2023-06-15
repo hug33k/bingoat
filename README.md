@@ -4,12 +4,12 @@ Bingo grid app for streamers
 
 ## In progress
 
-- [ ] User support
+- [x] User support
 - [ ] Security checks
 
 ## TODO
 
-- [ ] Auth support
+- [.] Auth support
 - [ ] Frontend
 
 ## About me

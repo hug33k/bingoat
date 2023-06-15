@@ -3,8 +3,9 @@ from sqlmodel import Field, SQLModel, Relationship
 
 
 class UserBase(SQLModel):
-	name: str
-	token: str
+	username: str
+	password: str
+	admin: bool = False
 
 
 class Users(UserBase, table=True):
@@ -19,12 +20,14 @@ class Users(UserBase, table=True):
 													"lazy": "select", "viewonly": True})
 
 
-class UserCreate(UserBase):
-	pass
+class UserCreate(SQLModel):
+	username: str
+	password: str
 
 
-class UserRead(UserBase):
+class UserRead(SQLModel):
 	id: int
+	username: str
 
 
 class UserReadWithRelations(UserRead):
@@ -35,5 +38,4 @@ class UserReadWithRelations(UserRead):
 
 
 class UserUpdate(SQLModel):
-	name: Optional[str] = None
-	token: Optional[str] = None
+	username: Optional[str] = None

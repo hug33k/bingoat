@@ -4,9 +4,9 @@ from .models import Grids, Cells, Zones, States, Users, Invites
 
 def inject_users(session):
 	users = [
-		Users(name="Utilisateur", token="user1"),
-		Users(name="Dev", token="user2"),
-		Users(name="Admin", token="user3")
+		Users(username="Utilisateur", password="user1"),
+		Users(username="Dev", password="user2"),
+		Users(username="Admin", password="user3", admin=True)
 	]
 	for user in users:
 		session.add(user)

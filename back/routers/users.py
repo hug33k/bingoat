@@ -50,7 +50,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 def decode_token(token):
 	return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-async def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
+async def get_current_user(token: str = Depends(oauth2_scheme),
+							session: Session = Depends(get_session)):
 	credentials_exception = HTTPException(
 		status_code=status.HTTP_401_UNAUTHORIZED,
 		detail="Could not validate credentials",
@@ -59,12 +60,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: Session
 	try:
 		data = decode_token(token)
 		username: str = data["sub"]
-		id: int = data["id"]
+		user_id: int = data["id"]
 		if username is None or id is None:
 			raise credentials_exception
-		token_data = TokenData(id=id, username=username)
-	except JWTError:
-		raise credentials_exception
+		token_data = TokenData(id=user_id, username=username)
+	except JWTError as exception:
+		raise credentials_exception from exception
 	user = session.get(Users, token_data.id)
 	if not user:
 		raise HTTPException(status_code=404, detail="User not found")
@@ -93,7 +94,7 @@ async def login(login_form: OAuth2PasswordRequestForm = Depends()):
 	return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("", response_model=List[UserRead])
-async def get_users(token: str = Depends(oauth2_scheme)):
+async def get_users(_: str = Depends(oauth2_scheme)):
 	with get_session() as session:
 		users = session.exec(select(Users)).all()
 		return users
